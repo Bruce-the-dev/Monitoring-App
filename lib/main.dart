@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -39,6 +41,8 @@ class _MapSampleState extends State<MapSample> {
   @override
   void initState() {
     super.initState();
+    startUpdatingMovingCars();
+    fetchMarkersFromAPI();
     _loadCarIcon();
     searchController = FloatingSearchBarController();
   }
@@ -64,27 +68,47 @@ class _MapSampleState extends State<MapSample> {
     final url = Uri.parse(
       'https://6828edd66075e87073a55065.mockapi.io/monitor/cars',
     );
-
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final List data = jsonDecode(response.body);
-
-      Set<Marker> markers = {};
+      Set<Marker> updatedMarkers = {};
 
       for (var item in data) {
-        markers.add(
+        final String id = item['id'];
+        final double newLat = item['latitude'].toDouble();
+        final double newLng = item['longitude'].toDouble();
+
+        // Check if marker already exists
+        final existingMarker = _allMarkers.firstWhere(
+          (marker) => marker.markerId.value == id,
+          orElse:
+              () => Marker(
+                markerId: MarkerId(id),
+                position: LatLng(newLat, newLng),
+              ),
+        );
+
+        // Check if position has changed
+        final hasMoved =
+            existingMarker.position.latitude != newLat ||
+            existingMarker.position.longitude != newLng;
+
+        if (hasMoved) {
+          print(
+            'Marker $id moved from ${existingMarker.position} to ($newLat, $newLng)',
+          );
+        }
+
+        // Create the updated marker
+        updatedMarkers.add(
           Marker(
-            markerId: MarkerId(item['id']),
-            position: LatLng(
-              item['latitude'].toDouble(),
-              item['longitude'].toDouble(),
-            ),
+            markerId: MarkerId(id),
+            position: LatLng(newLat, newLng),
             icon: _carIcon ?? BitmapDescriptor.defaultMarker,
             infoWindow: InfoWindow(
               title: 'Car name = ${item['name']}',
-              snippet:
-                  'Status: ${item['status']}', // ADDED: Status in info window
+              snippet: 'Status: ${item['status']}',
               onTap: () {
                 _goToCarDetailsScreen(item);
               },
@@ -94,10 +118,11 @@ class _MapSampleState extends State<MapSample> {
       }
 
       setState(() {
-        _allMarkers = markers; // ADDED: Store all markers
-        _filterMarkers(); // ADDED: Apply filters
+        _allMarkers = updatedMarkers;
+        _filterMarkers();
       });
-      _updateCameraToFitMarkers();
+    } else {
+      print('Failed to fetch markers: ${response.statusCode}');
     }
   }
 
@@ -208,6 +233,52 @@ class _MapSampleState extends State<MapSample> {
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     fetchMarkersFromAPI();
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      fetchMarkersFromAPI();
+    });
+  }
+
+  // Call this to start periodic updates every 5 seconds
+  void startUpdatingMovingCars() {
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      updateMovingCars();
+    });
+  }
+
+  // Simulate movement by updating only cars with "Moving" status
+  Future<void> updateMovingCars() async {
+    final url = Uri.parse(
+      'https://6828edd66075e87073a55065.mockapi.io/monitor/cars',
+    );
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      final random = Random();
+
+      for (var car in data) {
+        if (car['status'] == 'Moving') {
+          final double lat = car['latitude'];
+          final double lng = car['longitude'];
+
+          // Slightly change lat/lng to simulate movement
+          final double newLat = lat + (random.nextDouble() - 0.5) * 0.001;
+          final double newLng = lng + (random.nextDouble() - 0.5) * 0.001;
+
+          final updateUrl = Uri.parse('$url/${car['id']}');
+          await http.put(
+            updateUrl,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'latitude': newLat, 'longitude': newLng}),
+          );
+        }
+      }
+
+      print('Moving cars updated.');
+    } else {
+      print('Failed to fetch car data: ${response.statusCode}');
+    }
   }
 
   // MODIFIED: Updated build method with filter button
