@@ -101,15 +101,16 @@ dependencies:
 ```
 
 ---
-
 ## 📸 Screenshots
 
- ### initial map overview
-    ![Initial map over_View](screenshots/map%20overview.jpg)
- ### car details
-    ![vehicle detail modal](screenshots/car%20detail.jpg),
- ### search button
-    ![search button](screenshots/search%20button.jpg),
+### 🗺 Initial Map Overview
+![Initial map overview](screenshots/map%20overview.jpg)
+
+### 🚘 Car Details Modal
+![Vehicle detail modal](screenshots/car%20detail.jpg)
+
+### 🔍 Search Button
+![Search button](screenshots/search%20button.jpg)
 
 ---
 
