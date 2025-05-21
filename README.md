@@ -104,10 +104,12 @@ dependencies:
 
 ## 📸 Screenshots
 
--![Initial map over_View](screenshots/map%20overview.jpg)
-
-- ![vehicle detail modal](screenshots/car%20detail.jpg),
-- ![filtered view](screenshots/search%20button.jpg),
+ ### initial map overview
+    ![Initial map over_View](screenshots/map%20overview.jpg)
+ ### car details
+    ![vehicle detail modal](screenshots/car%20detail.jpg),
+ ### search button
+    ![search button](screenshots/search%20button.jpg),
 
 ---
 
