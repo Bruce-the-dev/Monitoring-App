@@ -36,6 +36,15 @@ A Flutter application that displays real-time vehicle locations on Google Maps w
 
 ---
 
+## ⚠️ Assumptions & Limitations
+
+- Real-time vehicle updates are **simulated** via periodic API requests.
+- Vehicles marked as "Moving" are artificially relocated every 5 seconds.
+- **State management using Provider** was initially intended but not implemented in the final version to maintain simplicity and avoid architectural complications during development.
+- Marker animation and filtering are handled within the `MaspScreen` logic directly, without external providers or controllers.
+
+---
+
 ## 🛠 To run THe App:
 
 Follow these steps to run the app:
@@ -93,25 +102,19 @@ dependencies:
 
 ---
 
-## ⚠️ Assumptions & Limitations
-
-- Real-time vehicle updates are **simulated** via periodic API requests.
-- Vehicles marked as "Moving" are artificially relocated every 5 seconds.
-- **State management using Provider** was initially intended but not implemented in the final version to maintain simplicity and avoid architectural complications during development.
-- Marker animation and filtering are handled within the `MapScreen` logic directly, without external providers or controllers.
-
----
-
 ## 📸 Screenshots
 
-_(Insert 2–3 screenshots showing: initial map view, vehicle detail modal, and filtered view)_
+-![Initial map over_View](screenshots/map%20overview.jpg)
+
+- ![vehicle detail modal](screenshots/car%20detail.jpg),
+- ![filtered view](screenshots/search%20button.jpg),
 
 ---
 
 ## 🎥 Demo Video
 
-_(Include a short screen recording or upload to YouTube and paste the link here)_
+-     showing how the real time location updates and the smooth animation
+
+[Click here to watch the demo video](screenshots/Demo%20Video.mp4)
 
 ---
-
-Let me know if you'd like a short script for the demo video or if you want help creating the screenshots.
